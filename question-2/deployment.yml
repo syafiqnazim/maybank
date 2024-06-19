@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  namespace: example-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+    spec:
+      containers:
+      - name: example-container
+        image: busybox
+        env:
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: password
+        volumeMounts:
+        - mountPath: "/mnt/efs"
+          name: efs-storage
+      volumes:
+      - name: efs-storage
+        persistentVolumeClaim:
+          claimName: example-pvc
